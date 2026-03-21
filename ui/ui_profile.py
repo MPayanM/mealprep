@@ -84,11 +84,16 @@ def render_profile(t: dict):
     gc4.metric(f"🥑 {t['fat']}",      f"{g['fat_min']}–{g['fat_max']} g")
 
     st.write("")
+    p = st.session_state.profile
+    sex_label      = t['sex_male'] if p['sex'] == 'male' else t['sex_female']
+    activity_label = t['activity_options'][p['activity']]
+    objective_label = t['objective_options'][p['objective']]
+
     st.info(
-        f"{t['based_on']}: **{st.session_state.profile['weight_kg']}kg · "
-        f"{st.session_state.profile['height_cm']}cm · "
-        f"{st.session_state.profile['age']}y · "
-        f"{st.session_state.profile['sex']} · "
-        f"{st.session_state.profile['activity']} · "
-        f"{st.session_state.profile['objective']}**"
+        f"{t['based_on']}: **{p['weight_kg']}kg · "
+        f"{p['height_cm']}cm · "
+        f"{p['age']}y · "
+        f"{sex_label} · "
+        f"{activity_label} · "
+        f"{objective_label}**"
     )
