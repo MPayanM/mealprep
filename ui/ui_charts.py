@@ -120,7 +120,7 @@ def _render_charts(totals: dict, g: dict):
             row=2, col=1
         )
 
-    # Legend traces — Min and Max only
+    # Min / Max legend (top right inside bar chart)
     fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
                              line=dict(color='#a6e3a1', dash='dot'),
                              name='Min'), row=1, col=1)
@@ -158,6 +158,18 @@ def _render_charts(totals: dict, g: dict):
         annotation.font = dict(size=17)
 
     st.plotly_chart(fig, use_container_width=True)
+
+    # Color legend below bar chart
+    st.markdown(
+        """
+        <div style='text-align:center; font-size:15px; margin-top:-20px;'>
+            <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
+            <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
+            <span style='color:#fab387'>■</span> Fat
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 def render_charts():
