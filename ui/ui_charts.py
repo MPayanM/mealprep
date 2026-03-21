@@ -60,7 +60,7 @@ def _render_charts(totals: dict, g: dict):
         rows=2, cols=1,
         subplot_titles=("Macros vs. Goals (g)", "Macro Distribution (% kcal)"),
         specs=[[{"type": "bar"}], [{"type": "pie"}]],
-        vertical_spacing=0.15
+        vertical_spacing=0.25
     )
 
     # Bar chart
@@ -70,6 +70,7 @@ def _render_charts(totals: dict, g: dict):
             marker_color=COLORS,
             opacity=0.85,
             name='Actual',
+            showlegend=False,
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
             textfont=dict(size=16),
@@ -91,14 +92,6 @@ def _render_charts(totals: dict, g: dict):
                       line=dict(color='#f38ba8', dash='dot', width=2),
                       row=1, col=1)
 
-    # Legend traces
-    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
-                             line=dict(color='#a6e3a1', dash='dot'),
-                             name='Min'), row=1, col=1)
-    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
-                             line=dict(color='#f38ba8', dash='dot'),
-                             name='Max'), row=1, col=1)
-
     # Pie chart
     if sum(macro_cals) > 0:
         fig.add_trace(
@@ -108,6 +101,7 @@ def _render_charts(totals: dict, g: dict):
                 textinfo='label+percent',
                 textfont=dict(size=16),
                 hole=0.35,
+                showlegend=False,
                 hovertemplate='%{label}: %{percent}<extra></extra>'
             ),
             row=2, col=1
@@ -120,10 +114,31 @@ def _render_charts(totals: dict, g: dict):
                 marker_colors=['#313244'],
                 textinfo='label',
                 textfont=dict(size=16),
-                hole=0.35
+                hole=0.35,
+                showlegend=False
             ),
             row=2, col=1
         )
+
+    # Legend traces — macro colors + Min and Max
+    fig.add_trace(go.Bar(x=[None], y=[None],
+                         marker_color='#89b4fa',
+                         name='Protein',
+                         showlegend=True), row=1, col=1)
+    fig.add_trace(go.Bar(x=[None], y=[None],
+                         marker_color='#a6e3a1',
+                         name='Carbs',
+                         showlegend=True), row=1, col=1)
+    fig.add_trace(go.Bar(x=[None], y=[None],
+                         marker_color='#fab387',
+                         name='Fat',
+                         showlegend=True), row=1, col=1)
+    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
+                             line=dict(color='#a6e3a1', dash='dot'),
+                             name='Min'), row=1, col=1)
+    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
+                             line=dict(color='#f38ba8', dash='dot'),
+                             name='Max'), row=1, col=1)
 
     fig.update_layout(
         height=800,
@@ -131,9 +146,14 @@ def _render_charts(totals: dict, g: dict):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#cdd6f4',
         font=dict(size=16),
-        legend=dict(orientation='h', y=0.52,
-                    font=dict(size=15),
-                    bgcolor='rgba(0,0,0,0)'),
+        legend=dict(
+            orientation='h',
+            x=0.5,
+            xanchor='center',
+            y=0.52,
+            font=dict(size=15),
+            bgcolor='rgba(0,0,0,0)'
+        ),
         margin=dict(t=60, b=20, l=10, r=10)
     )
     fig.update_xaxes(showgrid=False, row=1, col=1,
