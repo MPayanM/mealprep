@@ -1,8 +1,8 @@
 # ui/ui_menu.py
-# Renders the menu builder with live USDA food search.
+# Renders the menu builder with live API Ninjas nutrition search.
 
 import streamlit as st
-from data_loader import search_foods, get_macros_by_id
+from data_loader import search_foods
 
 MEALS = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
 MEAL_LABELS = {
@@ -15,7 +15,7 @@ MEAL_LABELS = {
 
 
 def render_menu():
-    """Renders the meal builder with USDA food search."""
+    """Renders the meal builder with API Ninjas nutrition search."""
 
     st.subheader("🍽️ Build Your Menu")
     st.caption("Add foods to each meal. Charts update automatically.")
@@ -73,7 +73,7 @@ def render_menu():
                     results = search_foods(query)
 
                 if results:
-                    options = {r['name']: r['food_id'] for r in results}
+                    options = {r['name']: r['macros'] for r in results}
                     selected = st.selectbox(
                         "Select food",
                         options=list(options.keys()),
@@ -91,15 +91,13 @@ def render_menu():
                     )
 
                     if st.button("＋ Add", key=f"add_{meal}"):
-                        fdc_id = options[selected]
-                        macros = get_macros_by_id(fdc_id)
-                        if macros:
-                            st.session_state.menu[meal].append({
-                                'food':   selected,
-                                'grams':  grams,
-                                'macros': macros
-                            })
-                            st.session_state['active_tab'] = 1
-                            st.rerun()
+                        macros = options[selected]
+                        st.session_state.menu[meal].append({
+                            'food':   selected,
+                            'grams':  grams,
+                            'macros': macros
+                        })
+                        st.session_state['active_tab'] = 1
+                        st.rerun()
                 else:
                     st.caption("No results found. Try a different search.")
