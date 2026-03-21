@@ -30,6 +30,9 @@ if 'profile' not in st.session_state:
         'objective': 'maintain',
     }
 
+if 'active_tab' not in st.session_state:
+    st.session_state['active_tab'] = 0
+
 # ── Header ────────────────────────────────────────────────────────────────────
 st.title("🥗 Meal Prep Tracker")
 st.caption("Track your daily macros against personalized nutritional goals.")
