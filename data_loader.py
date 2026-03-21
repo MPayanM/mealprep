@@ -22,7 +22,7 @@ def search_foods(query: str, max_results: int = 8) -> list[dict]:
             'api_key':  API_KEY,
             'query':    query,
             'pageSize': max_results,
-            'dataType': 'Foundation,SR Legacy,Survey (FNDDS)'
+            'dataType': 'Foundation,SR Legacy'
         }
     )
 
