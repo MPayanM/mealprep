@@ -72,7 +72,7 @@ def _render_charts(totals: dict, g: dict):
             name='Actual',
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
-            textfont=dict(size=14),
+            textfont=dict(size=18),
             hovertemplate='%{x}: %{y:.1f}g<extra></extra>'
         ),
         row=1, col=1
@@ -106,7 +106,7 @@ def _render_charts(totals: dict, g: dict):
                 labels=macros, values=macro_cals,
                 marker_colors=COLORS,
                 textinfo='label+percent',
-                textfont=dict(size=14),
+                textfont=dict(size=18),
                 hole=0.35,
                 hovertemplate='%{label}: %{percent}<extra></extra>'
             ),
@@ -119,7 +119,7 @@ def _render_charts(totals: dict, g: dict):
                 values=[1],
                 marker_colors=['#313244'],
                 textinfo='label',
-                textfont=dict(size=14),
+                textfont=dict(size=18),
                 hole=0.35
             ),
             row=2, col=1
