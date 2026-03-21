@@ -1,13 +1,14 @@
 # ui/ui_charts.py
-# Renders the live results panel (right column of Daily Menu tab).
+# Renders the live results panel with language support.
 
 import streamlit as st
 import plotly.graph_objects as go
 
 from tracker import DayTracker
 from goals import calculate_goals
+from data_loader import load_data
 
-MEALS = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
+MEALS  = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
 COLORS = ['#89b4fa', '#a6e3a1', '#fab387']
 
 
@@ -19,7 +20,6 @@ def _status_icon(val, min_v, max_v):
 
 
 def _build_totals() -> dict:
-    """Calculates nutritional totals from current session menu."""
     tracker = DayTracker()
     for meal in MEALS:
         for item in st.session_state.menu[meal]:
@@ -29,34 +29,34 @@ def _build_totals() -> dict:
     return tracker.get_totals()
 
 
-def _render_metrics(totals: dict, g: dict):
+def _render_metrics(totals: dict, g: dict, t: dict):
     m1, m2, m3, m4 = st.columns(4)
     m1.metric(
-        f"{_status_icon(totals['calories'], g['calories_min'], g['calories_max'])} Calories",
+        f"{_status_icon(totals['calories'], g['calories_min'], g['calories_max'])} {t['calories']}",
         f"{totals['calories']:.0f} kcal"
     )
     m2.metric(
-        f"{_status_icon(totals['protein'], g['protein_min'], g['protein_max'])} Protein",
+        f"{_status_icon(totals['protein'], g['protein_min'], g['protein_max'])} {t['protein']}",
         f"{totals['protein']:.1f} g"
     )
     m3.metric(
-        f"{_status_icon(totals['carbs'], g['carbs_min'], g['carbs_max'])} Carbs",
+        f"{_status_icon(totals['carbs'], g['carbs_min'], g['carbs_max'])} {t['carbs']}",
         f"{totals['carbs']:.1f} g"
     )
     m4.metric(
-        f"{_status_icon(totals['fat'], g['fat_min'], g['fat_max'])} Fat",
+        f"{_status_icon(totals['fat'], g['fat_min'], g['fat_max'])} {t['fat']}",
         f"{totals['fat']:.1f} g"
     )
 
 
-def _render_charts(totals: dict, g: dict):
-    macros     = ['Protein', 'Carbs', 'Fat']
+def _render_charts(totals: dict, g: dict, t: dict):
+    macros     = [t['protein'], t['carbs'], t['fat']]
     actual     = [totals['protein'], totals['carbs'], totals['fat']]
     min_vals   = [g['protein_min'], g['carbs_min'], g['fat_min']]
     max_vals   = [g['protein_max'], g['carbs_max'], g['fat_max']]
     macro_cals = [totals['protein'] * 4, totals['carbs'] * 4, totals['fat'] * 9]
 
-    # ── Figure 1: Bar chart ───────────────────────────────────────────────────
+    # ── Bar chart ─────────────────────────────────────────────────────────────
     fig_bar = go.Figure()
 
     fig_bar.add_trace(
@@ -84,13 +84,13 @@ def _render_charts(totals: dict, g: dict):
 
     fig_bar.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
                                  line=dict(color='#a6e3a1', dash='dot'),
-                                 name='Min'))
+                                 name=t['min_label']))
     fig_bar.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
                                  line=dict(color='#f38ba8', dash='dot'),
-                                 name='Max'))
+                                 name=t['max_label']))
 
     fig_bar.update_layout(
-        title=dict(text="Macros vs. Goals (g)", font=dict(size=24),
+        title=dict(text=t['macros_vs_goals'], font=dict(size=17),
                    x=0.5, xanchor='center'),
         height=400,
         paper_bgcolor='rgba(0,0,0,0)',
@@ -115,20 +115,19 @@ def _render_charts(totals: dict, g: dict):
 
     st.plotly_chart(fig_bar, use_container_width=True)
 
- 
-# ── Color legend between charts ───────────────────────────────────────────
+    # ── Color legend ──────────────────────────────────────────────────────────
     st.markdown(
-        """
+        f"""
         <div style='text-align:center; font-size:18px; margin: 10px 0 30px 0;'>
-            <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
-            <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
-            <span style='color:#fab387'>■</span> Fat
+            <span style='color:#89b4fa'>■</span> {t['protein']} &nbsp;&nbsp;
+            <span style='color:#a6e3a1'>■</span> {t['carbs']} &nbsp;&nbsp;
+            <span style='color:#fab387'>■</span> {t['fat']}
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ── Figure 2: Pie chart ───────────────────────────────────────────────────
+    # ── Pie chart ─────────────────────────────────────────────────────────────
     fig_pie = go.Figure()
 
     if sum(macro_cals) > 0:
@@ -146,7 +145,7 @@ def _render_charts(totals: dict, g: dict):
     else:
         fig_pie.add_trace(
             go.Pie(
-                labels=['Add foods to see distribution'],
+                labels=[t['add_foods_chart']],
                 values=[1],
                 marker_colors=['#313244'],
                 textinfo='label',
@@ -157,7 +156,7 @@ def _render_charts(totals: dict, g: dict):
         )
 
     fig_pie.update_layout(
-        title=dict(text="Macro Distribution (% kcal)", font=dict(size=24),
+        title=dict(text=t['macro_dist'], font=dict(size=17),
                    x=0.5, xanchor='center'),
         height=400,
         paper_bgcolor='rgba(0,0,0,0)',
@@ -170,14 +169,14 @@ def _render_charts(totals: dict, g: dict):
     st.plotly_chart(fig_pie, use_container_width=True)
 
 
-def render_charts():
-    """Renders the full live results panel: metrics + charts."""
+def render_charts(t: dict, lang: str):
+    """Renders the full live results panel."""
     g      = calculate_goals(st.session_state.profile)
     totals = _build_totals()
 
-    st.subheader("📊 Live Results")
+    st.subheader(t['live_results'])
     st.write("")
-    _render_metrics(totals, g)
+    _render_metrics(totals, g, t)
     st.write("")
     st.write("")
-    _render_charts(totals, g)
+    _render_charts(totals, g, t)
