@@ -1,35 +1,27 @@
 # ui/ui_menu.py
-# Renders the menu builder with live API Ninjas nutrition search.
+# Renders the menu builder with language support.
 
 import streamlit as st
-from data_loader import search_foods
+from data_loader import list_foods, get_macros
 
 MEALS = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
-MEAL_LABELS = {
-    'breakfast': '🌅 Breakfast',
-    'snack_1':   '🍎 Snack 1',
-    'lunch':     '🍽️ Lunch',
-    'snack_2':   '🥜 Snack 2',
-    'diner':     '🌙 Dinner',
-}
 
 
-def render_menu():
-    """Renders the meal builder with API Ninjas nutrition search."""
+def render_menu(t: dict, lang: str):
+    """Renders the meal builder using translations dict t and language lang."""
 
-    st.subheader("🍽️ Build Your Menu")
-    st.caption("Add foods to each meal. Charts update automatically.")
+    all_foods = list_foods(lang)
+
+    st.subheader(t['menu_title'])
+    st.caption(t['menu_caption'])
     st.markdown(
-        """
-        <div style='font-size:18px; margin: 0 0 16px 0;'>
-            👉 Quantities are in grams &nbsp;·&nbsp; 1 x 🥚 ~ 50 g
-        </div>
-        """,
+        f"<div style='font-size:18px; margin: 0 0 16px 0;'>{t['menu_tip']}</div>",
         unsafe_allow_html=True
     )
 
     for meal in MEALS:
-        with st.expander(MEAL_LABELS[meal], expanded=True):
+        label = t['meal_labels'][meal]
+        with st.expander(label, expanded=True):
             items     = st.session_state.menu[meal]
             to_remove = []
 
@@ -51,7 +43,7 @@ def render_menu():
                     st.markdown("<p style='padding-top:8px;color:gray'>g</p>",
                                 unsafe_allow_html=True)
                 with r4:
-                    if st.button("✕", key=f"remove_{meal}_{i}"):
+                    if st.button(t['remove_btn'], key=f"remove_{meal}_{i}"):
                         to_remove.append(i)
 
             for i in reversed(to_remove):
@@ -59,24 +51,23 @@ def render_menu():
                 st.session_state['active_tab'] = 1
                 st.rerun()
 
-            # Search box
+            # Search
             st.write("")
             query = st.text_input(
-                "Search food",
-                placeholder="e.g. chicken breast, oats, egg...",
+                "Search",
+                placeholder=t['search_placeholder'],
                 label_visibility='collapsed',
                 key=f"search_{meal}"
             )
 
             if query:
-                with st.spinner("Searching..."):
-                    results = search_foods(query)
+                matches = [f for f in all_foods
+                           if query.lower() in f.lower()]
 
-                if results:
-                    options = {r['name']: r['macros'] for r in results}
+                if matches:
                     selected = st.selectbox(
-                        "Select food",
-                        options=list(options.keys()),
+                        "Select",
+                        options=matches,
                         label_visibility='collapsed',
                         key=f"select_{meal}"
                     )
@@ -90,14 +81,15 @@ def render_menu():
                         key=f"new_grams_{meal}"
                     )
 
-                    if st.button("＋ Add", key=f"add_{meal}"):
-                        macros = options[selected]
-                        st.session_state.menu[meal].append({
-                            'food':   selected,
-                            'grams':  grams,
-                            'macros': macros
-                        })
-                        st.session_state['active_tab'] = 1
-                        st.rerun()
+                    if st.button(t['add_btn'], key=f"add_{meal}"):
+                        macros = get_macros(selected, lang)
+                        if macros:
+                            st.session_state.menu[meal].append({
+                                'food':   selected,
+                                'grams':  grams,
+                                'macros': macros
+                            })
+                            st.session_state['active_tab'] = 1
+                            st.rerun()
                 else:
-                    st.caption("No results found. Try a different search.")
+                    st.caption(t['no_results'])
