@@ -19,7 +19,7 @@ st.set_page_config(
 st.markdown("""
     <style>
         html, body, [class*="css"] {
-            font-size: 36px !important;
+            font-size: 24px !important;
         }
     </style>
 """, unsafe_allow_html=True)
