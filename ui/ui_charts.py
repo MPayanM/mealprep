@@ -72,6 +72,7 @@ def _render_charts(totals: dict, g: dict):
             name='Actual',
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
+            textfont=dict(size=14),
             hovertemplate='%{x}: %{y:.1f}g<extra></extra>'
         ),
         row=1, col=1
@@ -105,6 +106,7 @@ def _render_charts(totals: dict, g: dict):
                 labels=macros, values=macro_cals,
                 marker_colors=COLORS,
                 textinfo='label+percent',
+                textfont=dict(size=14),
                 hole=0.35,
                 hovertemplate='%{label}: %{percent}<extra></extra>'
             ),
@@ -117,6 +119,7 @@ def _render_charts(totals: dict, g: dict):
                 values=[1],
                 marker_colors=['#313244'],
                 textinfo='label',
+                textfont=dict(size=14),
                 hole=0.35
             ),
             row=2, col=1
@@ -127,14 +130,17 @@ def _render_charts(totals: dict, g: dict):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#cdd6f4',
+        font=dict(size=14),
         legend=dict(orientation='h', y=0.52,
-                    font=dict(size=11),
+                    font=dict(size=13),
                     bgcolor='rgba(0,0,0,0)'),
         margin=dict(t=40, b=20, l=10, r=10)
     )
-    fig.update_xaxes(showgrid=False, row=1, col=1)
+    fig.update_xaxes(showgrid=False, row=1, col=1,
+                     tickfont=dict(size=14))
     fig.update_yaxes(showgrid=True, gridcolor='#313244',
-                     range=[0, max(max_vals) * 1.2], row=1, col=1)
+                     range=[0, max(max_vals) * 1.2], row=1, col=1,
+                     tickfont=dict(size=13))
 
     st.plotly_chart(fig, use_container_width=True)
 
