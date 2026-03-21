@@ -28,7 +28,7 @@ st.markdown("""
         }
         /* Selectbox and number input text */
         .stSelectbox div, .stNumberInput div {
-            font-size: 16px !important;
+            font-size: 30px !important;
         }
         /* Expander labels */
         .streamlit-expanderHeader {
