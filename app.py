@@ -24,7 +24,7 @@ st.markdown("""
         }
         /* Captions */
         .st-emotion-cache-16idsys p {
-            font-size: 15px !important;
+            font-size: 30px !important;
         }
         /* Selectbox and number input text */
         .stSelectbox div, .stNumberInput div {
@@ -32,7 +32,7 @@ st.markdown("""
         }
         /* Expander labels */
         .streamlit-expanderHeader {
-            font-size: 48px !important;
+            font-size: 16px !important;
         }
         /* Metric labels */
         [data-testid="stMetricLabel"] {
