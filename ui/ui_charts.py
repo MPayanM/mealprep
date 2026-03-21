@@ -117,10 +117,13 @@ def _render_charts(totals: dict, g: dict):
  # ── Color legend between charts ───────────────────────────────────────────
     st.markdown(
         """
-        <div style='text-align:center; font-size:6px !important; margin: 10px 0 30px 0;'>
-            <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
-            <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
-            <span style='color:#fab387'>■</span> Fat
+        <div style='text-align:center; margin: 10px 0 30px 0;'>
+            <span style='color:#89b4fa; font-size:14px !important;'>■</span>
+            <span style='font-size:14px !important;'> Protein</span> &nbsp;&nbsp;
+            <span style='color:#a6e3a1; font-size:14px !important;'>■</span>
+            <span style='font-size:14px !important;'> Carbs</span> &nbsp;&nbsp;
+            <span style='color:#fab387; font-size:14px !important;'>■</span>
+            <span style='font-size:14px !important;'> Fat</span>
         </div>
         """,
         unsafe_allow_html=True
