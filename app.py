@@ -16,6 +16,14 @@ st.set_page_config(
     layout="wide"
 )
 
+st.markdown("""
+    <style>
+        html, body, [class*="css"] {
+            font-size: 18px !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # ── Session state ─────────────────────────────────────────────────────────────
 if 'menu' not in st.session_state:
     st.session_state.menu = {meal: [] for meal in MEALS}
