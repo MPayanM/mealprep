@@ -20,23 +20,23 @@ st.markdown("""
     <style>
         /* General text */
         p, div, span, label, input {
-            font-size: 14px !important;
+            font-size: 16px !important;
         }
         /* Captions */
         .st-emotion-cache-16idsys p {
-            font-size: 14px !important;
+            font-size: 16px !important;
         }
         /* Selectbox and number input text */
         .stSelectbox div, .stNumberInput div {
-            font-size: 14px !important;
+            font-size: 16px !important;
         }
         /* Expander labels */
         .streamlit-expanderHeader {
-            font-size: 15px !important;
+            font-size: 18px !important;
         }
         /* Metric labels */
         [data-testid="stMetricLabel"] {
-            font-size: 14px !important;
+            font-size: 16px !important;
         }
     </style>
 """, unsafe_allow_html=True)
