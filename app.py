@@ -20,7 +20,7 @@ st.markdown("""
     <style>
         /* General text */
         p, div, span, label, input {
-            font-size: 24px !important;
+            font-size: 20px !important;
         }
         /* Captions */
         .st-emotion-cache-16idsys p {
