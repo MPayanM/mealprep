@@ -2,7 +2,7 @@
 # Renders the menu builder (left column of Daily Menu tab).
 
 import streamlit as st
-from data_loader import list_foods
+from data_loader import search_foods, get_macros_by_id
 
 MEALS = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
 MEAL_LABELS = {
