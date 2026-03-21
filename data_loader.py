@@ -1,33 +1,74 @@
 # data_loader.py
-# Responsible for loading and querying the food database from the Excel file.
+# Queries the USDA FoodData Central API for food macros.
 
-import pandas as pd
+import requests
+import streamlit as st
 
-_excel_data = pd.read_excel('macros_alimentos.xlsx')
-_excel_data['name'] = _excel_data['name'].str.strip()
+BASE_URL = "https://api.nal.usda.gov/fdc/v1"
+API_KEY  = st.secrets["USDA_API_KEY"]
 
 
-def get_macros(food: str) -> dict | None:
+def search_foods(query: str, max_results: int = 8) -> list[dict]:
     """
-    Returns a dict with the macros of a food item (per its serving size).
-    Returns None if the food is not found in the database.
+    Searches USDA for foods matching the query.
+    Returns a list of dicts with 'fdc_id' and 'name'.
     """
-    row = _excel_data[_excel_data['name'].str.lower() == food.lower()]
+    if not query:
+        return []
 
-    if row.empty:
-        print(f"[data_loader] '{food}' not found in database.")
+    response = requests.get(
+        f"{BASE_URL}/foods/search",
+        params={
+            'api_key':  API_KEY,
+            'query':    query,
+            'pageSize': max_results,
+            'dataType': 'SR Legacy,Foundation'
+        }
+    )
+
+    if response.status_code != 200:
+        return []
+
+    results = []
+    for food in response.json().get('foods', []):
+        results.append({
+            'fdc_id': food['fdcId'],
+            'name':   food['description'].title()
+        })
+
+    return results
+
+
+def get_macros_by_id(fdc_id: int) -> dict | None:
+    """
+    Fetches full nutritional data for a food by its USDA fdc_id.
+    Returns a dict with calories, protein, carbs, fat, fiber (per 100g).
+    """
+    response = requests.get(
+        f"{BASE_URL}/food/{fdc_id}",
+        params={'api_key': API_KEY}
+    )
+
+    if response.status_code != 200:
         return None
 
-    return {
-        'calories': row['calories'].values[0],
-        'fat':      row['fat'].values[0],
-        'carbs':    row['carbs'].values[0],
-        'fiber':    row['fiber'].values[0],
-        'protein':  row['protein'].values[0],
-        'serving':  row['serving'].values[0]
+    nutrients = response.json().get('foodNutrients', [])
+
+    NUTRIENT_MAP = {
+        1008: 'calories',
+        1003: 'protein',
+        1005: 'carbs',
+        1004: 'fat',
+        1079: 'fiber',
     }
 
+    macros = {'calories': 0, 'protein': 0, 'carbs': 0,
+              'fat': 0, 'fiber': 0, 'serving': 100}
 
-def list_foods() -> list[str]:
-    """Returns a list of all available food names in the database."""
-    return _excel_data['name'].tolist()
+    for n in nutrients:
+        nutrient_id = n.get('nutrient', {}).get('id')
+        if nutrient_id in NUTRIENT_MAP:
+            key = NUTRIENT_MAP[nutrient_id]
+            macros[key] = n.get('amount', 0)
+
+    return macros
