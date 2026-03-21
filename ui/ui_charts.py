@@ -70,6 +70,7 @@ def _render_charts(totals: dict, g: dict):
             marker_color=COLORS,
             opacity=0.85,
             name='Actual',
+            showlegend=False,
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
             textfont=dict(size=16),
