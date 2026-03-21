@@ -130,7 +130,7 @@ def _render_charts(totals: dict, g: dict):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#cdd6f4',
-        font=dict(size=14),
+        font=dict(size=18),
         legend=dict(orientation='h', y=0.52,
                     font=dict(size=13),
                     bgcolor='rgba(0,0,0,0)'),
