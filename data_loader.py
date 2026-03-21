@@ -26,30 +26,35 @@ def _get_token() -> str:
 
 
 def search_foods(query: str, max_results: int = 10) -> list[dict]:
-    """
-    Searches FatSecret for foods matching the query.
-    Returns a list of dicts with 'food_id' and 'name'.
-    """
     if not query:
         return []
 
     token = _get_token()
+    if not token:
+        st.error("Authentication failed — check FatSecret credentials in Secrets.")
+        return []
 
     response = requests.get(
         BASE_URL,
         headers={'Authorization': f'Bearer {token}'},
         params={
-            'method':           'foods.search',
+            'method':            'foods.search',
             'search_expression': query,
             'max_results':       max_results,
-            'format':           'json',
+            'format':            'json',
         }
     )
 
     if response.status_code != 200:
+        st.error(f"API error {response.status_code}: {response.text}")
         return []
 
     data  = response.json()
+    
+    if 'error' in data:
+        st.error(f"FatSecret error: {data['error']}")
+        return []
+
     foods = data.get('foods', {}).get('food', [])
 
     if isinstance(foods, dict):
