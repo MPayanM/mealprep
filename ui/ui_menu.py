@@ -41,12 +41,13 @@ def render_menu():
                     )
                 with r2:
                     items[i]['grams'] = st.number_input(
-                        f"g##{meal}_{i}",
+                        "Grams",
                         min_value=0.0,
                         max_value=2000.0,
                         value=float(item['grams']),
                         step=5.0,
-                        label_visibility='visible',
+                        format="%.0f g",
+                        label_visibility='collapsed',
                         key=f"grams_{meal}_{i}"
                     )
                 with r3:
@@ -55,7 +56,7 @@ def render_menu():
 
             for i in reversed(to_remove):
                 st.session_state.menu[meal].pop(i)
-                st.session_state['active_tab'] = 1  # ← mantiene pestaña Daily Menu
+                st.session_state['active_tab'] = 1
                 st.rerun()
 
             if st.button("＋ Add food", key=f"add_{meal}"):
@@ -63,5 +64,5 @@ def render_menu():
                     'food':  all_foods[0],
                     'grams': 100.0
                 })
-                st.session_state['active_tab'] = 1  # ← mantiene pestaña Daily Menu
+                st.session_state['active_tab'] = 1
                 st.rerun()
