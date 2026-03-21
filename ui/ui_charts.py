@@ -89,7 +89,7 @@ def _render_charts(totals: dict, g: dict):
                                  name='Max'))
 
     fig_bar.update_layout(
-        title=dict(text="Macros vs. Goals (g)", font=dict(size=17),
+        title=dict(text="Macros vs. Goals (g)", font=dict(size=24),
                    x=0.5, xanchor='center'),
         height=400,
         paper_bgcolor='rgba(0,0,0,0)',
@@ -155,7 +155,7 @@ def _render_charts(totals: dict, g: dict):
         )
 
     fig_pie.update_layout(
-        title=dict(text="Macro Distribution (% kcal)", font=dict(size=17),
+        title=dict(text="Macro Distribution (% kcal)", font=dict(size=24),
                    x=0.5, xanchor='center'),
         height=400,
         paper_bgcolor='rgba(0,0,0,0)',
