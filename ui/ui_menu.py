@@ -1,5 +1,5 @@
 # ui/ui_menu.py
-# Renders the menu builder (left column of Daily Menu tab).
+# Renders the menu builder with live USDA food search.
 
 import streamlit as st
 from data_loader import search_foods, get_macros_by_id
@@ -15,14 +15,18 @@ MEAL_LABELS = {
 
 
 def render_menu():
-    """Renders the meal builder. Modifies st.session_state.menu directly."""
-
-    all_foods = list_foods()
+    """Renders the meal builder with USDA food search."""
 
     st.subheader("🍽️ Build Your Menu")
     st.caption("Add foods to each meal. Charts update automatically.")
-    st.caption("👉 &nbsp; Quantities are in grams: &nbsp; 1 x🥚 ~ 50 g.")
-    st.write("")
+    st.markdown(
+        """
+        <div style='font-size:18px; margin: 0 0 16px 0;'>
+            👉 Quantities are in grams &nbsp;·&nbsp; 1 x 🥚 ~ 50 g
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     for meal in MEALS:
         with st.expander(MEAL_LABELS[meal], expanded=True):
@@ -32,14 +36,7 @@ def render_menu():
             for i, item in enumerate(items):
                 r1, r2, r3, r4 = st.columns([3, 1, 0.3, 0.3])
                 with r1:
-                    items[i]['food'] = st.selectbox(
-                        f"Food##{meal}_{i}",
-                        options=all_foods,
-                        index=all_foods.index(item['food'])
-                              if item['food'] in all_foods else 0,
-                        label_visibility='collapsed',
-                        key=f"food_{meal}_{i}"
-                    )
+                    st.text(item['food'])
                 with r2:
                     items[i]['grams'] = st.number_input(
                         "Grams",
@@ -62,10 +59,47 @@ def render_menu():
                 st.session_state['active_tab'] = 1
                 st.rerun()
 
-            if st.button("＋ Add food", key=f"add_{meal}"):
-                st.session_state.menu[meal].append({
-                    'food':  all_foods[0],
-                    'grams': 100.0
-                })
-                st.session_state['active_tab'] = 1
-                st.rerun()
+            # Search box
+            st.write("")
+            query = st.text_input(
+                "Search food",
+                placeholder="e.g. chicken breast, oats, egg...",
+                label_visibility='collapsed',
+                key=f"search_{meal}"
+            )
+
+            if query:
+                with st.spinner("Searching..."):
+                    results = search_foods(query)
+
+                if results:
+                    options = {r['name']: r['fdc_id'] for r in results}
+                    selected = st.selectbox(
+                        "Select food",
+                        options=list(options.keys()),
+                        label_visibility='collapsed',
+                        key=f"select_{meal}"
+                    )
+                    grams = st.number_input(
+                        "Grams",
+                        min_value=1.0,
+                        max_value=2000.0,
+                        value=100.0,
+                        step=5.0,
+                        label_visibility='collapsed',
+                        key=f"new_grams_{meal}"
+                    )
+
+                    if st.button("＋ Add", key=f"add_{meal}"):
+                        fdc_id = options[selected]
+                        macros = get_macros_by_id(fdc_id)
+                        if macros:
+                            st.session_state.menu[meal].append({
+                                'food':   selected,
+                                'grams':  grams,
+                                'macros': macros
+                            })
+                            st.session_state['active_tab'] = 1
+                            st.rerun()
+                else:
+                    st.caption("No results found. Try a different search.")
