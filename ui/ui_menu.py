@@ -29,7 +29,7 @@ def render_menu():
             to_remove = []
 
             for i, item in enumerate(items):
-                r1, r2, r3 = st.columns([3, 1, 0.3])
+                r1, r2, r3, r4 = st.columns([3, 1, 0.3, 0.3])
                 with r1:
                     items[i]['food'] = st.selectbox(
                         f"Food##{meal}_{i}",
@@ -46,11 +46,13 @@ def render_menu():
                         max_value=2000.0,
                         value=float(item['grams']),
                         step=5.0,
-                        format="%.0f g",
                         label_visibility='collapsed',
                         key=f"grams_{meal}_{i}"
                     )
                 with r3:
+                    st.markdown("<p style='padding-top:8px;color:gray'>g</p>",
+                                unsafe_allow_html=True)
+                with r4:
                     if st.button("✕", key=f"remove_{meal}_{i}"):
                         to_remove.append(i)
 
