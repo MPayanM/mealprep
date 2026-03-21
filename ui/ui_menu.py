@@ -21,7 +21,7 @@ def render_menu():
 
     st.subheader("🍽️ Build Your Menu")
     st.caption("Add foods to each meal. Charts update automatically.")
-    st.caption("👉 &nbsp; Quantities are in grams: &nbsp; 1 x 🥚 ~ 50 g")
+    st.caption("👉 &nbsp; Quantities are in grams: &nbsp; 1 x🥚 ~ 50 g.")
     st.write("")
 
     for meal in MEALS:
