@@ -73,7 +73,7 @@ def render_menu():
                     results = search_foods(query)
 
                 if results:
-                    options = {r['name']: r['fdc_id'] for r in results}
+                    options = {r['name']: r['food_id'] for r in results}
                     selected = st.selectbox(
                         "Select food",
                         options=list(options.keys()),

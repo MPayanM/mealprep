@@ -1,74 +1,114 @@
 # data_loader.py
-# Queries the USDA FoodData Central API for food macros.
+# Queries the FatSecret Platform API for food macros.
 
 import requests
 import streamlit as st
 
-BASE_URL = "https://api.nal.usda.gov/fdc/v1"
-API_KEY  = st.secrets["USDA_API_KEY"]
+TOKEN_URL = "https://oauth.fatsecret.com/connect/token"
+BASE_URL  = "https://platform.fatsecret.com/rest/server.api"
+
+CLIENT_ID     = st.secrets["FATSECRET_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["FATSECRET_CLIENT_SECRET"]
 
 
-def search_foods(query: str, max_results: int = 20) -> list[dict]:
+def _get_token() -> str:
+    """Gets an OAuth2 access token from FatSecret."""
+    response = requests.post(
+        TOKEN_URL,
+        data={
+            'grant_type':    'client_credentials',
+            'scope':         'basic',
+            'client_id':     CLIENT_ID,
+            'client_secret': CLIENT_SECRET,
+        }
+    )
+    return response.json().get('access_token', '')
+
+
+def search_foods(query: str, max_results: int = 10) -> list[dict]:
     """
-    Searches USDA for foods matching the query.
-    Returns a list of dicts with 'fdc_id' and 'name'.
+    Searches FatSecret for foods matching the query.
+    Returns a list of dicts with 'food_id' and 'name'.
     """
     if not query:
         return []
 
+    token = _get_token()
+
     response = requests.get(
-        f"{BASE_URL}/foods/search",
+        BASE_URL,
+        headers={'Authorization': f'Bearer {token}'},
         params={
-            'api_key':  API_KEY,
-            'query':    query,
-            'pageSize': max_results,
-            'dataType': 'Foundation,SR Legacy',
+            'method':           'foods.search',
+            'search_expression': query,
+            'max_results':       max_results,
+            'format':           'json',
         }
     )
 
     if response.status_code != 200:
         return []
 
+    data  = response.json()
+    foods = data.get('foods', {}).get('food', [])
+
+    if isinstance(foods, dict):
+        foods = [foods]
+
     results = []
-    for food in response.json().get('foods', []):
+    for food in foods:
         results.append({
-            'fdc_id': food['fdcId'],
-            'name':   food['description'].title()
+            'food_id': food['food_id'],
+            'name':    food['food_name']
         })
 
     return results
 
 
-def get_macros_by_id(fdc_id: int) -> dict | None:
+def get_macros_by_id(food_id: str) -> dict | None:
     """
-    Fetches full nutritional data for a food by its USDA fdc_id.
-    Returns a dict with calories, protein, carbs, fat, fiber (per 100g).
+    Fetches nutritional data for a food by its FatSecret food_id.
+    Returns macros per 100g.
     """
+    token = _get_token()
+
     response = requests.get(
-        f"{BASE_URL}/food/{fdc_id}",
-        params={'api_key': API_KEY}
+        BASE_URL,
+        headers={'Authorization': f'Bearer {token}'},
+        params={
+            'method':  'food.get.v2',
+            'food_id': food_id,
+            'format':  'json',
+        }
     )
 
     if response.status_code != 200:
         return None
 
-    nutrients = response.json().get('foodNutrients', [])
+    food      = response.json().get('food', {})
+    servings  = food.get('servings', {}).get('serving', [])
 
-    NUTRIENT_MAP = {
-        1008: 'calories',
-        1003: 'protein',
-        1005: 'carbs',
-        1004: 'fat',
-        1079: 'fiber',
+    if isinstance(servings, dict):
+        servings = [servings]
+
+    # Find the 100g serving or use the first one
+    serving = next(
+        (s for s in servings if s.get('serving_description') == '100 g'),
+        servings[0] if servings else None
+    )
+
+    if not serving:
+        return None
+
+    # Scale to 100g if needed
+    metric_amount = float(serving.get('metric_serving_amount', 100) or 100)
+    factor        = 100 / metric_amount
+
+    return {
+        'calories': float(serving.get('calories', 0) or 0) * factor,
+        'protein':  float(serving.get('protein',  0) or 0) * factor,
+        'carbs':    float(serving.get('carbohydrate', 0) or 0) * factor,
+        'fat':      float(serving.get('fat',      0) or 0) * factor,
+        'fiber':    float(serving.get('fiber',    0) or 0) * factor,
+        'serving':  100
     }
-
-    macros = {'calories': 0, 'protein': 0, 'carbs': 0,
-              'fat': 0, 'fiber': 0, 'serving': 100}
-
-    for n in nutrients:
-        nutrient_id = n.get('nutrient', {}).get('id')
-        if nutrient_id in NUTRIENT_MAP:
-            key = NUTRIENT_MAP[nutrient_id]
-            macros[key] = n.get('amount', 0)
-
-    return macros
