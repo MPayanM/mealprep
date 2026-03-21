@@ -28,7 +28,7 @@ def render_menu(t: dict, lang: str):
             for i, item in enumerate(items):
                 r1, r2, r3, r4 = st.columns([3, 1, 0.3, 0.3])
                 with r1:
-                    st.text(item['food'])
+                    st.write(item['food'])
                 with r2:
                     items[i]['grams'] = st.number_input(
                         "Grams",
