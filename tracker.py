@@ -2,8 +2,6 @@
 # Core tracking logic. The DayTracker class manages a full day's meals
 # and computes nutritional totals without relying on global state.
 
-from data_loader import get_macros
-
 VALID_MEALS = ['breakfast', 'snack_1', 'lunch', 'snack_2', 'diner']
 
 EMPTY_TOTALS = {
@@ -18,25 +16,26 @@ EMPTY_TOTALS = {
 class DayTracker:
     """
     Tracks all meals and their nutritional content for a single day.
-    Instantiate a new DayTracker for each day — no global state, no resets needed.
+    Macros are stored per 100g from the USDA API and scaled by grams entered.
     """
 
     def __init__(self):
-        # Each meal is a list of dicts: {'food': str, 'grams': float, 'macros': dict}
         self.meals: dict[str, list] = {meal: [] for meal in VALID_MEALS}
 
-    def add(self, meal_name: str, food: str, grams: float) -> None:
-        """Adds a food item (in grams) to a specific meal."""
+    def add(self, meal_name: str, food: str, grams: float,
+            macros_per_100g: dict) -> None:
+        """
+        Adds a food item to a meal.
+        macros_per_100g: dict with calories, protein, carbs, fat, fiber
+        (all values are per 100g, serving field is ignored)
+        """
         if meal_name not in self.meals:
-            print(f"[tracker] '{meal_name}' is not a valid meal. Options: {VALID_MEALS}")
+            print(f"[tracker] '{meal_name}' is not a valid meal.")
             return
 
-        macros = get_macros(food)
-        if macros is None:
-            return
-
-        factor = grams / macros['serving']
-        scaled = {key: macros[key] * factor for key in EMPTY_TOTALS}
+        factor = grams / 100.0
+        scaled = {key: macros_per_100g.get(key, 0) * factor
+                  for key in EMPTY_TOTALS}
 
         self.meals[meal_name].append({
             'food':   food,
@@ -45,18 +44,16 @@ class DayTracker:
         })
 
     def get_totals(self) -> dict:
-        """Returns a dict with the summed nutritional totals for the full day."""
-        totals = dict(EMPTY_TOTALS)  # fresh copy
-
+        """Returns summed nutritional totals for the full day."""
+        totals = dict(EMPTY_TOTALS)
         for meal_items in self.meals.values():
             for item in meal_items:
                 for key in totals:
                     totals[key] += item['macros'][key]
-
         return totals
 
     def show_meals(self) -> None:
-        """Prints a readable summary of all meals and their contents."""
+        """Prints a readable summary of all meals."""
         for meal_name in VALID_MEALS:
             items = self.meals[meal_name]
             print(f"\n  {meal_name.upper()}:")

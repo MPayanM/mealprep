@@ -24,7 +24,8 @@ def _build_totals() -> dict:
     for meal in MEALS:
         for item in st.session_state.menu[meal]:
             if item['food'] and item['grams'] > 0:
-                tracker.add(meal, item['food'], item['grams'])
+                tracker.add(meal, item['food'], item['grams'],
+                            item.get('macros', {}))
     return tracker.get_totals()
 
 
@@ -118,7 +119,7 @@ def _render_charts(totals: dict, g: dict):
 # ── Color legend between charts ───────────────────────────────────────────
     st.markdown(
         """
-        <div style='text-align:center; font-size:1800000px; margin: 10px 0 30px 0;'>
+        <div style='text-align:center; font-size:18px; margin: 10px 0 30px 0;'>
             <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
             <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
             <span style='color:#fab387'>■</span> Fat
