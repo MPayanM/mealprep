@@ -55,29 +55,31 @@ if 'active_tab' not in st.session_state:
     st.session_state['active_tab'] = 0
 
 if 'lang' not in st.session_state:
-    st.session_state['lang'] = None  # None = not selected yet
+    st.session_state['lang'] = None
 
 # ── Language modal ────────────────────────────────────────────────────────────
 if st.session_state['lang'] is None:
     st.markdown("""
         <div style='text-align:center; padding: 60px 0 20px 0;'>
             <h1>🥗 Meal Prep Tracker</h1>
-            <p style='font-size:18px; color:gray;'>Select your language · Choisissez votre langue · Selecciona tu idioma</p>
+            <p style='font-size:18px; color:gray;'>
+                Select your language · Choisissez votre langue · Selecciona tu idioma
+            </p>
         </div>
     """, unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 2])
 
     with col2:
-        if st.button("🇨🇴  Español", use_container_width=True):
+        if st.button("🇨🇴  Español", use_container_width=True, key="modal_es"):
             st.session_state['lang'] = 'es'
             st.rerun()
     with col3:
-        if st.button("🇫🇷  Français", use_container_width=True):
+        if st.button("🇫🇷  Français", use_container_width=True, key="modal_fr"):
             st.session_state['lang'] = 'fr'
             st.rerun()
     with col4:
-        if st.button("🇬🇧  English", use_container_width=True):
+        if st.button("🇬🇧  English", use_container_width=True, key="modal_en"):
             st.session_state['lang'] = 'en'
             st.rerun()
 
@@ -96,18 +98,22 @@ with col_title:
 
 with col_lang:
     st.write("")
-    lang_map = {'es': '🇨🇴 ES', 'fr': '🇫🇷 FR', 'en': '🇬🇧 EN'}
-    new_lang = st.selectbox(
-        t['change_language'],
-        options=['es', 'fr', 'en'],
-        format_func=lambda x: lang_map[x],
-        index=['es', 'fr', 'en'].index(lang),
-        label_visibility='collapsed'
-    )
-    if new_lang != lang:
-        st.session_state['lang'] = new_lang
-        st.session_state['menu'] = {meal: [] for meal in MEALS}
-        st.rerun()
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        if st.button("🇨🇴", use_container_width=True, key="lang_es"):
+            st.session_state['lang'] = 'es'
+            st.session_state['menu'] = {meal: [] for meal in MEALS}
+            st.rerun()
+    with c2:
+        if st.button("🇫🇷", use_container_width=True, key="lang_fr"):
+            st.session_state['lang'] = 'fr'
+            st.session_state['menu'] = {meal: [] for meal in MEALS}
+            st.rerun()
+    with c3:
+        if st.button("🇬🇧", use_container_width=True, key="lang_en"):
+            st.session_state['lang'] = 'en'
+            st.session_state['menu'] = {meal: [] for meal in MEALS}
+            st.rerun()
 
 st.divider()
 
