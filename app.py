@@ -32,7 +32,7 @@ st.markdown("""
         }
         /* Expander labels */
         .streamlit-expanderHeader {
-            font-size: 16px !important;
+            font-size: 48px !important;
         }
         /* Metric labels */
         [data-testid="stMetricLabel"] {
