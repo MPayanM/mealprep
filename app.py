@@ -18,8 +18,25 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        html, body, [class*="css"] {
-            font-size: 24px !important;
+        /* General text */
+        p, div, span, label, input {
+            font-size: 16px !important;
+        }
+        /* Captions */
+        .st-emotion-cache-16idsys p {
+            font-size: 15px !important;
+        }
+        /* Selectbox and number input text */
+        .stSelectbox div, .stNumberInput div {
+            font-size: 16px !important;
+        }
+        /* Expander labels */
+        .streamlit-expanderHeader {
+            font-size: 16px !important;
+        }
+        /* Metric labels */
+        [data-testid="stMetricLabel"] {
+            font-size: 15px !important;
         }
     </style>
 """, unsafe_allow_html=True)
