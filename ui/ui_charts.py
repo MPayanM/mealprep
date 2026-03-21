@@ -3,7 +3,6 @@
 
 import streamlit as st
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 from tracker import DayTracker
 from goals import calculate_goals
@@ -56,45 +55,82 @@ def _render_charts(totals: dict, g: dict):
     max_vals   = [g['protein_max'], g['carbs_max'], g['fat_max']]
     macro_cals = [totals['protein'] * 4, totals['carbs'] * 4, totals['fat'] * 9]
 
-    fig = make_subplots(
-        rows=2, cols=1,
-        subplot_titles=("Macros vs. Goals (g)", "Macro Distribution (% kcal)"),
-        specs=[[{"type": "bar"}], [{"type": "pie"}]],
-        vertical_spacing=0.25
-    )
+    # ── Figure 1: Bar chart ───────────────────────────────────────────────────
+    fig_bar = go.Figure()
 
-    # Bar chart
-    fig.add_trace(
+    fig_bar.add_trace(
         go.Bar(
             x=macros, y=actual,
             marker_color=COLORS,
             opacity=0.85,
-            name='Actual',
             showlegend=False,
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
             textfont=dict(size=16),
             hovertemplate='%{x}: %{y:.1f}g<extra></extra>'
-        ),
-        row=1, col=1
+        )
     )
 
-    # Min / Max lines
     for i in range(len(macros)):
-        fig.add_shape(type='line',
-                      x0=i - 0.4, x1=i + 0.4,
-                      y0=min_vals[i], y1=min_vals[i],
-                      line=dict(color='#a6e3a1', dash='dot', width=2),
-                      row=1, col=1)
-        fig.add_shape(type='line',
-                      x0=i - 0.4, x1=i + 0.4,
-                      y0=max_vals[i], y1=max_vals[i],
-                      line=dict(color='#f38ba8', dash='dot', width=2),
-                      row=1, col=1)
+        fig_bar.add_shape(type='line',
+                          x0=i - 0.4, x1=i + 0.4,
+                          y0=min_vals[i], y1=min_vals[i],
+                          line=dict(color='#a6e3a1', dash='dot', width=2))
+        fig_bar.add_shape(type='line',
+                          x0=i - 0.4, x1=i + 0.4,
+                          y0=max_vals[i], y1=max_vals[i],
+                          line=dict(color='#f38ba8', dash='dot', width=2))
 
-    # Pie chart
+    fig_bar.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
+                                 line=dict(color='#a6e3a1', dash='dot'),
+                                 name='Min'))
+    fig_bar.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
+                                 line=dict(color='#f38ba8', dash='dot'),
+                                 name='Max'))
+
+    fig_bar.update_layout(
+        title=dict(text="Macros vs. Goals (g)", font=dict(size=17),
+                   x=0.5, xanchor='center'),
+        height=400,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#cdd6f4',
+        font=dict(size=16),
+        legend=dict(
+            orientation='v',
+            x=0.95, xanchor='right',
+            y=0.95, yanchor='top',
+            font=dict(size=15),
+            bgcolor='rgba(30,30,46,0.8)',
+            bordercolor='#313244',
+            borderwidth=1
+        ),
+        margin=dict(t=50, b=10, l=10, r=10)
+    )
+    fig_bar.update_xaxes(showgrid=False, tickfont=dict(size=16))
+    fig_bar.update_yaxes(showgrid=True, gridcolor='#313244',
+                         range=[0, max(max_vals) * 1.2],
+                         tickfont=dict(size=16))
+
+    st.plotly_chart(fig_bar, use_container_width=True)
+
+    # ── Color legend between charts ───────────────────────────────────────────
+    st.markdown(
+        """
+        <div style='text-align:center; font-size:15px; margin: -10px 0 10px 0;'>
+            <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
+            <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
+            <span style='color:#fab387'>■</span> Fat
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # ── Figure 2: Pie chart ───────────────────────────────────────────────────
+    fig_pie = go.Figure()
+
     if sum(macro_cals) > 0:
-        fig.add_trace(
+        fig_pie.add_trace(
             go.Pie(
                 labels=macros, values=macro_cals,
                 marker_colors=COLORS,
@@ -103,11 +139,10 @@ def _render_charts(totals: dict, g: dict):
                 hole=0.35,
                 showlegend=False,
                 hovertemplate='%{label}: %{percent}<extra></extra>'
-            ),
-            row=2, col=1
+            )
         )
     else:
-        fig.add_trace(
+        fig_pie.add_trace(
             go.Pie(
                 labels=['Add foods to see distribution'],
                 values=[1],
@@ -116,60 +151,21 @@ def _render_charts(totals: dict, g: dict):
                 textfont=dict(size=16),
                 hole=0.35,
                 showlegend=False
-            ),
-            row=2, col=1
+            )
         )
 
-    # Min / Max legend (top right inside bar chart)
-    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
-                             line=dict(color='#a6e3a1', dash='dot'),
-                             name='Min'), row=1, col=1)
-    fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
-                             line=dict(color='#f38ba8', dash='dot'),
-                             name='Max'), row=1, col=1)
-
-    fig.update_layout(
-        height=800,
+    fig_pie.update_layout(
+        title=dict(text="Macro Distribution (% kcal)", font=dict(size=17),
+                   x=0.5, xanchor='center'),
+        height=400,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#cdd6f4',
         font=dict(size=16),
-        legend=dict(
-            orientation='v',
-            x=0.95,
-            xanchor='right',
-            y=0.95,
-            yanchor='top',
-            font=dict(size=15),
-            bgcolor='rgba(30,30,46,0.8)',
-            bordercolor='#313244',
-            borderwidth=1
-        ),
-        margin=dict(t=60, b=20, l=10, r=10)
+        margin=dict(t=50, b=10, l=10, r=10)
     )
-    fig.update_xaxes(showgrid=False, row=1, col=1,
-                     tickfont=dict(size=16))
-    fig.update_yaxes(showgrid=True, gridcolor='#313244',
-                     range=[0, max(max_vals) * 1.2], row=1, col=1,
-                     tickfont=dict(size=16))
 
-    # Subplot titles bigger
-    for annotation in fig.layout.annotations:
-        annotation.font = dict(size=17)
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Color legend below bar chart
-    st.markdown(
-        """
-        <div style='text-align:center; font-size:15px; margin-top:-20px;'>
-            <span style='color:#89b4fa'>■</span> Protein &nbsp;&nbsp;
-            <span style='color:#a6e3a1'>■</span> Carbs &nbsp;&nbsp;
-            <span style='color:#fab387'>■</span> Fat
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.plotly_chart(fig_pie, use_container_width=True)
 
 
 def render_charts():
