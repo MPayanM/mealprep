@@ -8,7 +8,7 @@ BASE_URL = "https://api.nal.usda.gov/fdc/v1"
 API_KEY  = st.secrets["USDA_API_KEY"]
 
 
-def search_foods(query: str, max_results: int = 8) -> list[dict]:
+def search_foods(query: str, max_results: int = 20) -> list[dict]:
     """
     Searches USDA for foods matching the query.
     Returns a list of dicts with 'fdc_id' and 'name'.
@@ -22,6 +22,7 @@ def search_foods(query: str, max_results: int = 8) -> list[dict]:
             'api_key':  API_KEY,
             'query':    query,
             'pageSize': max_results,
+            'dataType': 'Foundation,SR Legacy',
         }
     )
 
