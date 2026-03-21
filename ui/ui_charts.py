@@ -60,7 +60,7 @@ def _render_charts(totals: dict, g: dict):
         rows=2, cols=1,
         subplot_titles=("Macros vs. Goals (g)", "Macro Distribution (% kcal)"),
         specs=[[{"type": "bar"}], [{"type": "pie"}]],
-        vertical_spacing=0.15
+        vertical_spacing=0.25
     )
 
     # Bar chart
@@ -72,7 +72,7 @@ def _render_charts(totals: dict, g: dict):
             name='Actual',
             text=[f"{v:.1f}g" for v in actual],
             textposition='outside',
-            textfont=dict(size=18),
+            textfont=dict(size=16),
             hovertemplate='%{x}: %{y:.1f}g<extra></extra>'
         ),
         row=1, col=1
@@ -106,7 +106,7 @@ def _render_charts(totals: dict, g: dict):
                 labels=macros, values=macro_cals,
                 marker_colors=COLORS,
                 textinfo='label+percent',
-                textfont=dict(size=18),
+                textfont=dict(size=16),
                 hole=0.35,
                 hovertemplate='%{label}: %{percent}<extra></extra>'
             ),
@@ -119,27 +119,32 @@ def _render_charts(totals: dict, g: dict):
                 values=[1],
                 marker_colors=['#313244'],
                 textinfo='label',
-                textfont=dict(size=18),
+                textfont=dict(size=16),
                 hole=0.35
             ),
             row=2, col=1
         )
 
     fig.update_layout(
-        height=700,
+        height=800,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#cdd6f4',
+        font=dict(size=16),
         legend=dict(orientation='h', y=0.52,
-                    font=dict(size=18),
+                    font=dict(size=15),
                     bgcolor='rgba(0,0,0,0)'),
-        margin=dict(t=40, b=20, l=10, r=10)
+        margin=dict(t=60, b=20, l=10, r=10)
     )
     fig.update_xaxes(showgrid=False, row=1, col=1,
-                     tickfont=dict(size=18))
+                     tickfont=dict(size=16))
     fig.update_yaxes(showgrid=True, gridcolor='#313244',
                      range=[0, max(max_vals) * 1.2], row=1, col=1,
-                     tickfont=dict(size=18))
+                     tickfont=dict(size=16))
+
+    # Subplot titles bigger
+    for annotation in fig.layout.annotations:
+        annotation.font = dict(size=17)
 
     st.plotly_chart(fig, use_container_width=True)
 
@@ -152,5 +157,6 @@ def render_charts():
     st.subheader("📊 Live Results")
     st.write("")
     _render_metrics(totals, g)
+    st.write("")
     st.write("")
     _render_charts(totals, g)
