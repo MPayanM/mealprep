@@ -120,19 +120,7 @@ def _render_charts(totals: dict, g: dict):
             row=2, col=1
         )
 
-    # Legend traces — macro colors + Min and Max
-    fig.add_trace(go.Bar(x=[None], y=[None],
-                         marker_color='#89b4fa',
-                         name='Protein',
-                         showlegend=True), row=1, col=1)
-    fig.add_trace(go.Bar(x=[None], y=[None],
-                         marker_color='#a6e3a1',
-                         name='Carbs',
-                         showlegend=True), row=1, col=1)
-    fig.add_trace(go.Bar(x=[None], y=[None],
-                         marker_color='#fab387',
-                         name='Fat',
-                         showlegend=True), row=1, col=1)
+    # Legend traces — Min and Max only
     fig.add_trace(go.Scatter(x=[None], y=[None], mode='lines',
                              line=dict(color='#a6e3a1', dash='dot'),
                              name='Min'), row=1, col=1)
@@ -147,12 +135,15 @@ def _render_charts(totals: dict, g: dict):
         font_color='#cdd6f4',
         font=dict(size=16),
         legend=dict(
-            orientation='h',
-            x=0.5,
-            xanchor='center',
-            y=0.52,
+            orientation='v',
+            x=0.95,
+            xanchor='right',
+            y=0.95,
+            yanchor='top',
             font=dict(size=15),
-            bgcolor='rgba(0,0,0,0)'
+            bgcolor='rgba(30,30,46,0.8)',
+            bordercolor='#313244',
+            borderwidth=1
         ),
         margin=dict(t=60, b=20, l=10, r=10)
     )
