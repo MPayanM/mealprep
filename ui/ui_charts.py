@@ -60,7 +60,7 @@ def _render_charts(totals: dict, g: dict):
         rows=2, cols=1,
         subplot_titles=("Macros vs. Goals (g)", "Macro Distribution (% kcal)"),
         specs=[[{"type": "bar"}], [{"type": "pie"}]],
-        vertical_spacing=0.25
+        vertical_spacing=0.15
     )
 
     # Bar chart
