@@ -1,0 +1,12 @@
+# Personal data
+user_profile.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Streamlit cache
+.streamlit/
+
+# Excel locks (Windows)
+~$*.xlsx
