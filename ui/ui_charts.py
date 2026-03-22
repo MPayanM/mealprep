@@ -30,51 +30,22 @@ def _build_totals() -> dict:
 
 def _render_metrics(totals: dict, g: dict, t: dict):
     m1, m2, m3, m4 = st.columns(4)
-
-    def metric_html(label, value, icon, val, min_v, max_v):
-        if val == 0:
-            color = '#6c7086'
-        elif val < min_v:
-            color = '#fab387'
-        elif val > max_v:
-            color = '#f38ba8'
-        else:
-            color = '#a6e3a1'
-        return f"""
-        <div style='text-align:center; padding: 8px 0;'>
-            <div style='font-size:10px; color:#6c7086; margin-bottom:4px;'>{icon} {label}</div>
-            <div style='font-size:16px; font-weight:bold; color:{color};'>{value}</div>
-        </div>
-        """
-
-    with m1:
-        st.markdown(metric_html(
-            t['calories'],
-            f"{totals['calories']:.0f} kcal",
-            _status_icon(totals['calories'], g['calories_min'], g['calories_max']),
-            totals['calories'], g['calories_min'], g['calories_max']
-        ), unsafe_allow_html=True)
-    with m2:
-        st.markdown(metric_html(
-            t['protein'],
-            f"{totals['protein']:.1f} g",
-            _status_icon(totals['protein'], g['protein_min'], g['protein_max']),
-            totals['protein'], g['protein_min'], g['protein_max']
-        ), unsafe_allow_html=True)
-    with m3:
-        st.markdown(metric_html(
-            t['carbs'],
-            f"{totals['carbs']:.1f} g",
-            _status_icon(totals['carbs'], g['carbs_min'], g['carbs_max']),
-            totals['carbs'], g['carbs_min'], g['carbs_max']
-        ), unsafe_allow_html=True)
-    with m4:
-        st.markdown(metric_html(
-            t['fat'],
-            f"{totals['fat']:.1f} g",
-            _status_icon(totals['fat'], g['fat_min'], g['fat_max']),
-            totals['fat'], g['fat_min'], g['fat_max']
-        ), unsafe_allow_html=True)
+    m1.metric(
+        f"{_status_icon(totals['calories'], g['calories_min'], g['calories_max'])} {t['calories']}",
+        f"{totals['calories']:.0f} kcal"
+    )
+    m2.metric(
+        f"{_status_icon(totals['protein'], g['protein_min'], g['protein_max'])} {t['protein']}",
+        f"{totals['protein']:.1f} g"
+    )
+    m3.metric(
+        f"{_status_icon(totals['carbs'], g['carbs_min'], g['carbs_max'])} {t['carbs']}",
+        f"{totals['carbs']:.1f} g"
+    )
+    m4.metric(
+        f"{_status_icon(totals['fat'], g['fat_min'], g['fat_max'])} {t['fat']}",
+        f"{totals['fat']:.1f} g"
+    )
 
 
 def _render_charts(totals: dict, g: dict, t: dict):
