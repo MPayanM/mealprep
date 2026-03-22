@@ -19,7 +19,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        div, label, input {
+        p, div, span, label, input {
             font-size: 16px !important;
         }
         .st-emotion-cache-16idsys p {
@@ -31,11 +31,8 @@ st.markdown("""
         .streamlit-expanderHeader {
             font-size: 18px !important;
         }
-        [data-testid="stMetricLabel"] p {
-            font-size: 11px !important;
-        }
-        [data-testid="stMetricValue"] {
-            font-size: 28px !important;
+        [data-testid="stMetricLabel"] {
+            font-size: 160spx !important;
         }
     </style>
 """, unsafe_allow_html=True)
