@@ -32,7 +32,7 @@ st.markdown("""
             font-size: 18px !important;
         }
         [data-testid="stMetricLabel"] {
-            font-size: 32spx !important;
+            font-size: 320spx !important;
         }
     </style>
 """, unsafe_allow_html=True)
