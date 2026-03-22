@@ -19,7 +19,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        p, div, span, label, input {
+        div, label, input {
             font-size: 16px !important;
         }
         .st-emotion-cache-16idsys p {
