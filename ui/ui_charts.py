@@ -42,8 +42,8 @@ def _render_metrics(totals: dict, g: dict, t: dict):
             color = '#a6e3a1'
         return f"""
         <div style='text-align:center; padding: 8px 0;'>
-            <div style='font-size:12px; color:#6c7086; margin-bottom:4px;'>{icon} {label}</div>
-            <div style='font-size:24px; font-weight:bold; color:{color};'>{value}</div>
+            <div style='font-size:10px; color:#6c7086; margin-bottom:4px;'>{icon} {label}</div>
+            <div style='font-size:16px; font-weight:bold; color:{color};'>{value}</div>
         </div>
         """
 
