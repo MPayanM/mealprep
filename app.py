@@ -31,7 +31,7 @@ st.markdown("""
         .streamlit-expanderHeader {
             font-size: 18px !important;
         }
-        [data-testid="stMetricLabel"] {
+        [data-testid="stMetricLabel"] * {
             font-size: 160spx !important;
         }
     </style>
