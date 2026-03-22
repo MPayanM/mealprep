@@ -14,9 +14,9 @@ EMPTY_TOTALS = {
 
 
 class DayTracker:
-    """
+     """
     Tracks all meals and their nutritional content for a single day.
-    Macros are stored per 100g from the USDA API and scaled by grams entered.
+    Macros are scaled by grams entered relative to the 100g serving base.
     """
 
     def __init__(self):
