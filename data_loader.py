@@ -2,9 +2,15 @@
 # Loads food database from Excel based on selected language sheet.
 
 import pandas as pd
+import unicodedata
 import streamlit as st
 
 EXCEL_PATH = 'macros_alimentos.xlsx'
+
+
+def normalize(text: str) -> str:
+    """Removes accents and lowercases text for accent-insensitive comparison."""
+    return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode().lower()
 
 
 @st.cache_data
@@ -12,6 +18,7 @@ def load_data(lang: str) -> pd.DataFrame:
     """Loads the food database for the given language sheet (es, fr, en)."""
     df = pd.read_excel(EXCEL_PATH, sheet_name=lang)
     df['name'] = df['name'].str.strip()
+    df['name_normalized'] = df['name'].apply(normalize)
     return df
 
 
@@ -21,9 +28,9 @@ def list_foods(lang: str) -> list[str]:
 
 
 def get_macros(food: str, lang: str) -> dict | None:
-    """Returns macros for a food item. Returns None if not found."""
+    """Returns macros for a food item. Accent-insensitive. Returns None if not found."""
     df  = load_data(lang)
-    row = df[df['name'].str.lower() == food.lower()]
+    row = df[df['name_normalized'] == normalize(food)]
 
     if row.empty:
         return None

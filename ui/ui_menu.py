@@ -1,5 +1,5 @@
 # ui/ui_menu.py
-# Renders the menu builder with language support.
+# Renders the menu builder with language support and accent-insensitive search.
 
 import streamlit as st
 from data_loader import list_foods, get_macros
@@ -25,6 +25,7 @@ def render_menu(t: dict, lang: str):
             items     = st.session_state.menu[meal]
             to_remove = []
 
+            # Existing food rows
             for i, item in enumerate(items):
                 r1, r2, r3, r4 = st.columns([3, 1, 0.3, 0.3])
                 with r1:
@@ -48,48 +49,38 @@ def render_menu(t: dict, lang: str):
 
             for i in reversed(to_remove):
                 st.session_state.menu[meal].pop(i)
-                st.session_state['active_tab'] = 1
                 st.rerun()
 
-            # Search
+            # ── Food selector ─────────────────────────────────────────────────
             st.write("")
-            query = st.text_input(
-                "Search",
-                placeholder=t['search_placeholder'],
+
+            # Placeholder option — empty by default
+            options    = [''] + all_foods
+            selected   = st.selectbox(
+                t['search_placeholder'],
+                options=options,
+                index=0,
                 label_visibility='collapsed',
-                key=f"search_{meal}"
+                key=f"select_{meal}"
             )
 
-            if query:
-                matches = [f for f in all_foods
-                           if query.lower() in f.lower()]
+            if selected:
+                grams = st.number_input(
+                    "Grams",
+                    min_value=1.0,
+                    max_value=2000.0,
+                    value=100.0,
+                    step=5.0,
+                    label_visibility='collapsed',
+                    key=f"new_grams_{meal}"
+                )
 
-                if matches:
-                    selected = st.selectbox(
-                        "Select",
-                        options=matches,
-                        label_visibility='collapsed',
-                        key=f"select_{meal}"
-                    )
-                    grams = st.number_input(
-                        "Grams",
-                        min_value=1.0,
-                        max_value=2000.0,
-                        value=100.0,
-                        step=5.0,
-                        label_visibility='collapsed',
-                        key=f"new_grams_{meal}"
-                    )
-
-                    if st.button(t['add_btn'], key=f"add_{meal}"):
-                        macros = get_macros(selected, lang)
-                        if macros:
-                            st.session_state.menu[meal].append({
-                                'food':   selected,
-                                'grams':  grams,
-                                'macros': macros
-                            })
-                            st.session_state['active_tab'] = 1
-                            st.rerun()
-                else:
-                    st.caption(t['no_results'])
+                if st.button(t['add_btn'], key=f"add_{meal}"):
+                    macros = get_macros(selected, lang)
+                    if macros:
+                        st.session_state.menu[meal].append({
+                            'food':   selected,
+                            'grams':  grams,
+                            'macros': macros
+                        })
+                        st.rerun()
