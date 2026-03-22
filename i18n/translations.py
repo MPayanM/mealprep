@@ -5,7 +5,7 @@ TRANSLATIONS = {
     'es': {
         # General
         'app_title':   '🥗 Meal Prep Tracker',
-        'app_caption': 'Sigue tus macros diarios contra tus objetivos nutricionales personalizados.',
+        'app_caption': 'Sigue tus macros diarios en tiempo real y ajusta tu menú para alcanzar tus objetivos nutricionales.',
 
         # Language selector
         'change_language': 'Cambiar idioma',
@@ -81,7 +81,7 @@ TRANSLATIONS = {
     'fr': {
         # General
         'app_title':   '🥗 Meal Prep Tracker',
-        'app_caption': 'Suivez vos macros quotidiens par rapport à vos objectifs nutritionnels personnalisés.',
+        'app_caption': 'Suivez vos macros au quotidien et ajustez votre menu pour atteindre vos objectifs nutritionnels.',
 
         # Language selector
         'change_language': 'Changer de langue',
@@ -157,7 +157,7 @@ TRANSLATIONS = {
     'en': {
         # General
         'app_title':   '🥗 Meal Prep Tracker',
-        'app_caption': 'Track your daily macros against personalized nutritional goals.',
+        'app_caption': 'Track your daily macros in real time and adjust the menu to achieve your nutritional goals.',
 
         # Language selector
         'change_language': 'Change language',
