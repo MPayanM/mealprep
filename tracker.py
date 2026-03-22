@@ -14,7 +14,7 @@ EMPTY_TOTALS = {
 
 
 class DayTracker:
-     """
+    """
     Tracks all meals and their nutritional content for a single day.
     Macros are scaled by grams entered relative to the 100g serving base.
     """
